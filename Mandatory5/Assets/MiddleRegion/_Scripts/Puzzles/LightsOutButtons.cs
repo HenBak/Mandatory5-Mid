@@ -1,25 +1,32 @@
 using UnityEngine;
-using UnityEngine.UI;
+
 
 
 public class LightsOutButtons : MonoBehaviour
 {
 
     public bool active = false;
-    public Color32 activeColor = new Color32(200, 255, 255, 255);
-    public Color32 inactiveColor = new Color32(90, 90, 90, 255);
+    public GameObject LOLight;
+    
 
+    public Material LightsOutActive;
+    public Material LightsOutInactive;
+
+   
     public void ChangeActivity()
     {
         if (active)
         {
             active = false;
-            GetComponent<Image>().color = inactiveColor;
+            Debug.Log("dababy");
+            LOLight.GetComponent<MeshRenderer>().material = LightsOutInactive;
+          
         }
         else
         {
             active = true;
-            GetComponent<Image>().color = activeColor;
+            LOLight.GetComponent<MeshRenderer>().material = LightsOutActive;
+
         }
 
     }
