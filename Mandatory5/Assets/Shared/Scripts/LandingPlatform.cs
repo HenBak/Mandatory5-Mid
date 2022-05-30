@@ -10,15 +10,22 @@ public class LandingPlatform : MonoBehaviour
     [SerializeField] private Animator shipAnimator;
     private AnimatorClipInfo[] clipInfos;
     private float landingTime, takeOffTime;
-    private GameObject pl;
+    public GameObject nestedParentArmature, playerModel;
     public GameObject plPrefab;
     public GameObject exitText;
+
+    private Transform landingCamera;
 
     // Start is called before the first frame update
     void Start()
     {
         clipInfos = shipAnimator.GetCurrentAnimatorClipInfo(0);
         landingTime = clipInfos[0].clip.length;
+
+        landingCamera = transform.parent.Find("Landing Platform Camera");
+        /*mainCamera.parent = transform;
+        mainCamera.localPosition = new Vector3(0f, 3f, 10f);
+        mainCamera.localRotation = new Quaternion(0f, 1f, 0f, 0f);*/
         
         Invoke("PlayerSpawn", landingTime);
     }
@@ -26,12 +33,12 @@ public class LandingPlatform : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (pl != null && Vector3.Distance(transform.position, pl.transform.position) < 2f)
+        if (plActive == true && playerModel != null && Vector3.Distance(transform.position, playerModel.transform.position) < 3f)
         {
             exitText.SetActive(true);
-            if (plActive == false && Input.GetKeyDown(KeyCode.F))
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                plActive = true;
+                plActive = false;
                 LeaveRegion();
             }
         }
@@ -39,25 +46,46 @@ public class LandingPlatform : MonoBehaviour
         {
             exitText.SetActive(false);
         }
+        
+        if (landingCamera.gameObject.activeSelf)
+        {
+            landingCamera.LookAt(shipAnimator.transform);
+        }
+
     }
 
     private void PlayerSpawn()
     {
-        pl = GameObject.FindGameObjectWithTag("Player");
+        /*pl = GameObject.FindGameObjectWithTag("Player");
         if (pl == null)
         {
-            pl = GameObject.Instantiate(plPrefab, transform.position + transform.forward * 3f, Quaternion.identity);
+            pl = GameObject.Instantiate(plPrefab, transform.position + transform.forward * 3.5f, Quaternion.identity);
         }
         else
         {
             pl.transform.localPosition = transform.forward * 3f;
         }
-        pl.transform.rotation = transform.root.rotation;
+        plModel = pl.transform.Find("PlayerArmature").gameObject;
+        pl.transform.rotation = transform.root.rotation;*/
+        /*mainCamera.parent = pl.transform;
+        mainCamera.localPosition = new Vector3(0f, 3f, 5f);
+        mainCamera.LookAt(pl.transform);*/
+        
+        plActive = true;
+        landingCamera.gameObject.SetActive(false);
+        nestedParentArmature.SetActive(true);
+        //exitText.transform.parent.GetComponent<Canvas>().worldCamera = pl.transform.Find("MainCamera").GetComponent<Camera>();
     }
 
     private void LeaveRegion()
     {
-        Destroy(pl);
+        /*mainCamera.parent = transform;
+        mainCamera.localPosition = new Vector3(0f, 3f, 10f);
+        mainCamera.localRotation = new Quaternion(0f, 1f, 0f, 0f);*/
+        nestedParentArmature.SetActive(false);
+        landingCamera.gameObject.SetActive(true);
+        
+        //Destroy(pl);
         shipAnimator.SetBool("LeaveRegion", true);
         clipInfos = shipAnimator.GetCurrentAnimatorClipInfo(0);
         takeOffTime = clipInfos[0].clip.length;
